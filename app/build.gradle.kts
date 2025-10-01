@@ -43,10 +43,12 @@ android {
     productFlavors {
         create("develop") {
             dimension = "Environment"
+            buildConfigField("String", "BASE_URL", "\"https://jsonplaceholder.typicode.com/\"")
         }
 
         create("production") {
             dimension = "Environment"
+            buildConfigField("String", "BASE_URL", "\"https://jsonplaceholder.typicode.com/\"")
         }
     }
 
