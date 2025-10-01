@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Posts</string>
+    <string name="posts">Posts</string>
+    <string name="favorites">Favorites</string>
 </resources>
