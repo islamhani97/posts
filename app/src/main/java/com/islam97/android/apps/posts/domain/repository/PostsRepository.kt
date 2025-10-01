@@ -1,0 +1,8 @@
+package com.islam97.android.apps.posts.domain.repository
+
+import com.islam97.android.apps.posts.core.utils.Result
+import com.islam97.android.apps.posts.domain.model.Post
+
+interface PostsRepository {
+    suspend fun getPostList(): Result<List<Post>>
+}
