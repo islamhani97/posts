@@ -32,7 +32,7 @@ class PostsViewModel
                 }
 
                 is PostsIntent.NavigateToDetailsScreen -> {
-                    mutableEffectFlow.emit(PostsEffect.NavigateToDetailsScreen)
+                    mutableEffectFlow.emit(PostsEffect.NavigateToDetailsScreen(intent.post))
                 }
             }
         }
@@ -63,9 +63,9 @@ data class PostsState(
 
 sealed interface PostsIntent {
     data object GetPostList : PostsIntent
-    data object NavigateToDetailsScreen : PostsIntent
+    data class NavigateToDetailsScreen(val post: Post) : PostsIntent
 }
 
 sealed interface PostsEffect {
-    data object NavigateToDetailsScreen : PostsEffect
+    data class NavigateToDetailsScreen(val post: Post) : PostsEffect
 }
