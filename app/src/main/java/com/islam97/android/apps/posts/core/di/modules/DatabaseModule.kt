@@ -3,7 +3,8 @@ package com.islam97.android.apps.posts.core.di.modules
 import android.content.Context
 import androidx.room.Room
 import com.islam97.android.apps.posts.data.room.AppDatabase
-import com.islam97.android.apps.posts.data.room.PostsDao
+import com.islam97.android.apps.posts.data.room.dao.FavoritesDao
+import com.islam97.android.apps.posts.data.room.dao.PostsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,5 +27,11 @@ class DatabaseModule {
     @Provides
     fun providePostsDao(dataBase: AppDatabase): PostsDao {
         return dataBase.postsDao()
+    }
+
+    @Singleton
+    @Provides
+    fun provideFavoritesDao(dataBase: AppDatabase): FavoritesDao {
+        return dataBase.favoritesDao()
     }
 }

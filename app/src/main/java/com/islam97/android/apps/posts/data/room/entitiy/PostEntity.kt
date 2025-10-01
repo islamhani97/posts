@@ -1,4 +1,4 @@
-package com.islam97.android.apps.posts.data.room
+package com.islam97.android.apps.posts.data.room.entitiy
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
