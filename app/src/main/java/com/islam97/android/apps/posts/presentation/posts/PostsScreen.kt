@@ -28,10 +28,16 @@ fun PostsScreen(navController: NavHostController, viewModel: PostsViewModel = hi
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.effectFlow.collect {
-            when (it) {
+        viewModel.effectFlow.collect { effect ->
+            when (effect) {
                 is PostsEffect.NavigateToDetailsScreen -> {
-                    navController.navigate(RoutePostDetailsScreen)
+                    navController.navigate(
+                        RoutePostDetailsScreen(
+                            postId = effect.post.id,
+                            title = effect.post.title,
+                            body = effect.post.body
+                        )
+                    )
                 }
             }
         }
@@ -60,15 +66,12 @@ fun PostsScreen(navController: NavHostController, viewModel: PostsViewModel = hi
                         }
                         .fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(8.dp)
-                ) {
+                    contentPadding = PaddingValues(8.dp)) {
                     items(state.posts.size) { index ->
                         PostItem(
-                            post = state.posts[index],
-                            onClick = {
-                                viewModel.handleIntent(PostsIntent.NavigateToDetailsScreen)
-                            }
-                        )
+                            post = state.posts[index], onClick = {
+                                viewModel.handleIntent(PostsIntent.NavigateToDetailsScreen(it))
+                            })
                     }
                 }
             }

@@ -113,7 +113,7 @@ fun MainContent() {
             }
 
             composable<RoutePostDetailsScreen> {
-                PostDetailsScreen(navController)
+                PostDetailsScreen(navController, it)
             }
         }
     }

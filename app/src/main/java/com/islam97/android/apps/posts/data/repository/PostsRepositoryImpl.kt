@@ -6,6 +6,7 @@ import com.islam97.android.apps.posts.data.mapper.toEntity
 import com.islam97.android.apps.posts.data.mapper.toModel
 import com.islam97.android.apps.posts.data.remote.PostsApi
 import com.islam97.android.apps.posts.data.room.PostsDao
+import com.islam97.android.apps.posts.domain.model.Comment
 import com.islam97.android.apps.posts.domain.model.Post
 import com.islam97.android.apps.posts.domain.repository.PostsRepository
 import javax.inject.Inject
@@ -33,5 +34,10 @@ class PostsRepositoryImpl
 
     override suspend fun clearAllPostsFromRoom() {
         postsDao.clearAll()
+    }
+
+    override suspend fun getPostComments(postId: Long): Result<List<Comment>> {
+        return apiCallHandler.callApi(
+            apiCall = { postsApi.getPostComments(postId) }) { map { it.toModel() } }
     }
 }
