@@ -2,4 +2,6 @@
     <string name="app_name">Posts</string>
     <string name="posts">Posts</string>
     <string name="favorites">Favorites</string>
+    <string name="error_network">Error %1$d</string>
+    <string name="error_something_went_wrong">Something went wrong</string>
 </resources>
