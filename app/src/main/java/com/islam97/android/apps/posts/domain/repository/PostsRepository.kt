@@ -5,4 +5,7 @@ import com.islam97.android.apps.posts.domain.model.Post
 
 interface PostsRepository {
     suspend fun getPostList(): Result<List<Post>>
+    suspend fun getPostListFromRoom(): Result<List<Post>>
+    suspend fun insertAllPostsIntoRoom(posts: List<Post>)
+    suspend fun clearAllPostsFromRoom()
 }

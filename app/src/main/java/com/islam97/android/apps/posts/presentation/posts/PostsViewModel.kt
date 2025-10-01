@@ -8,6 +8,7 @@ import com.islam97.android.apps.posts.presentation.base.MviViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,17 +40,17 @@ class PostsViewModel
 
     private fun getPostList() {
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = getPostListUseCase.invoke()) {
-                is Result.Success<*> -> {
-                    mutableState.value = mutableState.value.copy(
-                        isLoading = false,
-                        posts = result.data as List<Post>
-                    )
-                }
+            getPostListUseCase.invoke().collectLatest { result ->
+                when (result) {
+                    is Result.Success<*> -> {
+                        mutableState.value = mutableState.value.copy(
+                            isLoading = false, posts = result.data as List<Post>
+                        )
+                    }
 
-                is Result.Error -> {
-                    mutableState.value =
-                        mutableState.value.copy(isLoading = false, posts = listOf())
+                    is Result.Error -> {
+                        mutableState.value = mutableState.value.copy(isLoading = false)
+                    }
                 }
             }
         }
@@ -57,8 +58,7 @@ class PostsViewModel
 }
 
 data class PostsState(
-    val isLoading: Boolean = true,
-    val posts: List<Post> = listOf()
+    val isLoading: Boolean = true, val posts: List<Post> = listOf()
 )
 
 sealed interface PostsIntent {
