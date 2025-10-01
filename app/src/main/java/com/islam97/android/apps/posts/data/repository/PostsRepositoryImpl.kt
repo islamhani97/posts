@@ -5,7 +5,7 @@ import com.islam97.android.apps.posts.core.utils.Result
 import com.islam97.android.apps.posts.data.mapper.toEntity
 import com.islam97.android.apps.posts.data.mapper.toModel
 import com.islam97.android.apps.posts.data.remote.PostsApi
-import com.islam97.android.apps.posts.data.room.PostsDao
+import com.islam97.android.apps.posts.data.room.dao.PostsDao
 import com.islam97.android.apps.posts.domain.model.Comment
 import com.islam97.android.apps.posts.domain.model.Post
 import com.islam97.android.apps.posts.domain.repository.PostsRepository

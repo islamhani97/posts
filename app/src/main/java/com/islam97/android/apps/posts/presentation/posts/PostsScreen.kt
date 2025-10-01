@@ -34,6 +34,7 @@ fun PostsScreen(navController: NavHostController, viewModel: PostsViewModel = hi
                     navController.navigate(
                         RoutePostDetailsScreen(
                             postId = effect.post.id,
+                            userId = effect.post.userId,
                             title = effect.post.title,
                             body = effect.post.body
                         )
