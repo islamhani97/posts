@@ -4,8 +4,12 @@ import com.islam97.android.apps.posts.domain.repository.FavoriteRepository
 import javax.inject.Inject
 
 class DeleteFromFavoriteUseCase
-@Inject constructor(private val favoriteRepository: FavoriteRepository) {
+@Inject constructor(
+    private val favoriteRepository: FavoriteRepository,
+    private val syncFavoriteUseCase: SyncFavoriteUseCase
+) {
     suspend operator fun invoke(postId: Long) {
-        return favoriteRepository.delete(postId)
+        favoriteRepository.delete(postId)
+        syncFavoriteUseCase.invoke()
     }
 }

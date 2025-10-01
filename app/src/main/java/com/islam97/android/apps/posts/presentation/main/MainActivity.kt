@@ -46,83 +46,82 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
 
-@Composable
-fun MainContent() {
-    val navController = rememberNavController()
-    val currentBackStack by navController.currentBackStackEntryAsState()
-    val currentRoute = currentBackStack?.destination?.route
+    @Composable
+    fun MainContent() {
+        val navController = rememberNavController()
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentRoute = currentBackStack?.destination?.route
 
-    Scaffold(
-        bottomBar = {
-            when (currentRoute) {
-                RoutePostsScreen.toStringRoute(), RouteFavoritesScreen.toStringRoute() -> {
-                    NavigationBar {
-                        NavigationItem(
-                            icon = Icons.AutoMirrored.Filled.List,
-                            label = stringResource(R.string.posts),
-                            navController = navController,
-                            currentRoute = currentRoute,
-                            route = RoutePostsScreen
-                        )
-                        NavigationItem(
-                            icon = Icons.Default.Favorite,
-                            label = stringResource(R.string.favorites),
-                            navController = navController,
-                            currentRoute = currentRoute,
-                            route = RouteFavoritesScreen
-                        )
+        Scaffold(
+            bottomBar = {
+                when (currentRoute) {
+                    RoutePostsScreen.toStringRoute(), RouteFavoritesScreen.toStringRoute() -> {
+                        NavigationBar {
+                            NavigationItem(
+                                icon = Icons.AutoMirrored.Filled.List,
+                                label = stringResource(R.string.posts),
+                                navController = navController,
+                                currentRoute = currentRoute,
+                                route = RoutePostsScreen
+                            )
+                            NavigationItem(
+                                icon = Icons.Default.Favorite,
+                                label = stringResource(R.string.favorites),
+                                navController = navController,
+                                currentRoute = currentRoute,
+                                route = RouteFavoritesScreen
+                            )
+                        }
                     }
+                }
+            }) { innerPadding ->
+            NavHost(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                navController = navController,
+                startDestination = RoutePostsScreen,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { it }, animationSpec = tween(NAVIGATION_DURATION)
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { -it }, animationSpec = tween(NAVIGATION_DURATION)
+                    )
+                },
+                popEnterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it }, animationSpec = tween(NAVIGATION_DURATION)
+                    )
+                },
+                popExitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { it }, animationSpec = tween(NAVIGATION_DURATION)
+                    )
+                }) {
+                composable<RoutePostsScreen> {
+                    PostsScreen(navController)
+                }
+
+                composable<RouteFavoritesScreen> {
+                    FavoritesScreen(navController)
+                }
+
+                composable<RoutePostDetailsScreen> {
+                    PostDetailsScreen(navController, it)
                 }
             }
         }
-    ) { innerPadding ->
-        NavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            navController = navController,
-            startDestination = RoutePostsScreen,
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { it }, animationSpec = tween(NAVIGATION_DURATION)
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { -it }, animationSpec = tween(NAVIGATION_DURATION)
-                )
-            },
-            popEnterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { -it }, animationSpec = tween(NAVIGATION_DURATION)
-                )
-            },
-            popExitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { it }, animationSpec = tween(NAVIGATION_DURATION)
-                )
-            }) {
-            composable<RoutePostsScreen> {
-                PostsScreen(navController)
-            }
-
-            composable<RouteFavoritesScreen> {
-                FavoritesScreen(navController)
-            }
-
-            composable<RoutePostDetailsScreen> {
-                PostDetailsScreen(navController, it)
-            }
-        }
     }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewMainActivity() {
-    PostsTheme {
-        MainContent()
+    @Preview(showBackground = true)
+    @Composable
+    fun PreviewMainActivity() {
+        PostsTheme {
+            MainContent()
+        }
     }
 }
