@@ -122,6 +122,20 @@ dependencies {
     // Work
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
+
+    // Mockk
+    implementation(libs.mockk)
+
+    // Google Truth
+    testImplementation(libs.truth)
+    androidTestImplementation(libs.truth)
+
+    // Turbine
+    testImplementation(libs.turbine)
+
+    // Kotlin Coroutines Test
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(kotlin("test"))
 }
 
 // Allow references to generated code
