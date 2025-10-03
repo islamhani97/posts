@@ -23,8 +23,7 @@ class PostDetailsViewModel
     private val isPostFavoriteUseCase: IsPostFavoriteUseCase,
     private val insertToFavoriteUseCase: InsertToFavoriteUseCase,
     private val deleteFromFavoriteUseCase: DeleteFromFavoriteUseCase
-) :
-    MviViewModel<PostDetailsState, PostDetailsIntent, PostDetailsEffect>() {
+) : MviViewModel<PostDetailsState, PostDetailsIntent, PostDetailsEffect>() {
 
     override val mutableState: MutableStateFlow<PostDetailsState> =
         MutableStateFlow(PostDetailsState())
@@ -61,12 +60,19 @@ class PostDetailsViewModel
             when (val result = getPostCommentsUseCase.invoke(postId)) {
                 is Result.Success<*> -> {
                     mutableState.value = mutableState.value.copy(
-                        isLoading = false, comments = result.data as List<Comment>
+                        isLoading = false,
+                        comments = result.data as List<Comment>,
+                        errorMessage = null,
+                        errorRetry = null
                     )
                 }
 
                 is Result.Error -> {
-                    mutableState.value = mutableState.value.copy(isLoading = false)
+                    mutableState.value = mutableState.value.copy(
+                        isLoading = false,
+                        comments = listOf(),
+                        errorMessage = result.errorMessage,
+                        errorRetry = { handleIntent(PostDetailsIntent.GetPostComments(postId)) })
                 }
             }
         }
@@ -96,7 +102,9 @@ class PostDetailsViewModel
 data class PostDetailsState(
     val isLoading: Boolean = true,
     val isFavorite: Boolean = false,
-    val comments: List<Comment> = listOf()
+    val comments: List<Comment> = listOf(),
+    val errorMessage: String? = null,
+    val errorRetry: (() -> Unit)? = null
 )
 
 sealed interface PostDetailsIntent {
