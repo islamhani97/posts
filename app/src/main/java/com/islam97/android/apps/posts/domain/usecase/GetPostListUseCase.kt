@@ -11,7 +11,12 @@ class GetPostListUseCase
 @Inject constructor(private val postsRepository: PostsRepository) {
     suspend operator fun invoke(): Flow<Result<List<Post>>> {
         return flow {
-            emit(postsRepository.getPostListFromRoom())
+
+            // check the cached posts data if not empty it will be emitted
+            val cachedPosts = postsRepository.getPostListFromRoom()
+            if (cachedPosts is Result.Success && cachedPosts.data?.isNotEmpty() ?: false) {
+                emit(cachedPosts)
+            }
             when (val remotePostList = postsRepository.getPostList()) {
                 is Result.Success -> {
                     emit(remotePostList)

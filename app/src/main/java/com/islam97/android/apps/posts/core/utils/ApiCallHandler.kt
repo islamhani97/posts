@@ -9,8 +9,14 @@ import javax.inject.Singleton
 
 @Singleton
 class ApiCallHandler
-@Inject constructor(@ApplicationContext private val context: Context) {
+@Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val connectivityObserver: ConnectivityObserver,
+) {
     suspend fun <T, S> callApi(apiCall: suspend () -> T, map: T.() -> S?): Result<S> {
+        if (connectivityObserver.networkStatus.value != NetworkStatus.Available) {
+            return Result.Error(context.getString(R.string.error_internet_connection))
+        }
         return try {
             Result.Success(apiCall().map())
         } catch (e: HttpException) {

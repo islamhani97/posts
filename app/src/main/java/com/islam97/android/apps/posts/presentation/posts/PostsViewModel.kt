@@ -44,12 +44,18 @@ class PostsViewModel
                 when (result) {
                     is Result.Success<*> -> {
                         mutableState.value = mutableState.value.copy(
-                            isLoading = false, posts = result.data as List<Post>
+                            isLoading = false,
+                            posts = result.data as List<Post>,
+                            errorMessage = null,
+                            errorRetry = null
                         )
                     }
 
                     is Result.Error -> {
-                        mutableState.value = mutableState.value.copy(isLoading = false)
+                        mutableState.value = mutableState.value.copy(
+                            isLoading = false,
+                            errorMessage = result.errorMessage,
+                            errorRetry = { handleIntent(PostsIntent.GetPostList) })
                     }
                 }
             }
@@ -58,7 +64,10 @@ class PostsViewModel
 }
 
 data class PostsState(
-    val isLoading: Boolean = true, val posts: List<Post> = listOf()
+    val isLoading: Boolean = true,
+    val posts: List<Post> = listOf(),
+    val errorMessage: String? = null,
+    val errorRetry: (() -> Unit)? = null
 )
 
 sealed interface PostsIntent {
