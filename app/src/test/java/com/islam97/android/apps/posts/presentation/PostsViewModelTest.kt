@@ -40,19 +40,18 @@ class PostsViewModelTest {
     }
 
     @Test
-    fun `should emit posts on GetPostList intent success`() = runTest {
+    fun `should emit post list when GetPostList intent success`() = runTest {
         // Arrange
         val testPostList = listOf(
-            Post(id = 1, title = "Post 1", body = "Body 1", userId = 1),
-            Post(id = 2, title = "Post 2", body = "Body 2", userId = 2)
+            Post(userId = 1, id = 1, title = "Post 1", body = "Body 1"),
+            Post(userId = 2, id = 2, title = "Post 2", body = "Body 2")
         )
         coEvery { getPostListUseCase() } returns flowOf(Result.Success(testPostList))
-        viewModel.state.test {
-            // Act
-            viewModel.handleIntent(PostsIntent.GetPostList)
 
-            // Assert
-            skipItems(1)
+        // Act & Assert
+        viewModel.state.test {
+            viewModel.handleIntent(PostsIntent.GetPostList)
+            skipItems(1) //skip first emission which is for old state
             val state = awaitItem()
             Truth.assertThat(state.isLoading).isFalse()
             Truth.assertThat(state.posts).isEqualTo(testPostList)
@@ -62,17 +61,15 @@ class PostsViewModelTest {
     }
 
     @Test
-    fun `should emit error state on GetPostList intent failure`() = runTest {
+    fun `should emit error when GetPostList intent failure`() = runTest {
         // Arrange
         val errorMessage = "Something went wrong"
         coEvery { getPostListUseCase() } returns flowOf(Result.Error(errorMessage))
 
         viewModel.state.test {
-            // Act
+            // Act & Assert
             viewModel.handleIntent(PostsIntent.GetPostList)
-
-            // Assert
-            skipItems(1)
+            skipItems(1) //skip first emission which is for old state
             val state = awaitItem()
             Truth.assertThat(state.isLoading).isFalse()
             Truth.assertThat(state.errorMessage).isEqualTo(errorMessage)
@@ -81,14 +78,13 @@ class PostsViewModelTest {
     }
 
     @Test
-    fun `should emit navigation effect on NavigateToDetailsScreen intent`() = runTest {
+    fun `should emit navigation effect when NavigateToDetailsScreen intent`() = runTest {
         // Arrange
-        val post = Post(id = 1, title = "Post", body = "Body", userId = 1)
-        viewModel.effectFlow.test {
-            // Act
-            viewModel.handleIntent(PostsIntent.NavigateToDetailsScreen(post))
+        val post = Post(userId = 1, id = 1, title = "Post", body = "Body")
 
-            // Assert
+        // Act & Assert
+        viewModel.effectFlow.test {
+            viewModel.handleIntent(PostsIntent.NavigateToDetailsScreen(post))
             Truth.assertThat(awaitItem() is PostsEffect.NavigateToDetailsScreen).isTrue()
         }
     }

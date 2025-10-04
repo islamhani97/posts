@@ -40,19 +40,18 @@ class FavoritesViewModelTest {
     }
 
     @Test
-    fun `should emit favorite posts on GetFavoritePosts intent`() = runTest {
+    fun `should emit favorite posts when GetFavoritePosts intent`() = runTest {
         // Arrange
         val testPostList = listOf(
-            Post(id = 1, title = "Post 1", body = "Body 1", userId = 1),
-            Post(id = 2, title = "Post 2", body = "Body 2", userId = 2)
+            Post(userId = 1, id = 1, title = "Post 1", body = "Body 1"),
+            Post(userId = 2, id = 2, title = "Post 2", body = "Body 2")
         )
         coEvery { getFavoritePostsUseCase.invoke() } returns flowOf(testPostList)
-        viewModel.state.test {
-            // Act
-            viewModel.handleIntent(FavoritesIntent.GetFavoritePosts)
 
-            // Assert
-            skipItems(1)
+        // Act & Assert
+        viewModel.state.test {
+            viewModel.handleIntent(FavoritesIntent.GetFavoritePosts)
+            skipItems(1) //skip first emission which is for old state
             val state = awaitItem()
             Truth.assertThat(state.isLoading).isFalse()
             Truth.assertThat(state.favoritePosts).isEqualTo(testPostList)
@@ -61,14 +60,13 @@ class FavoritesViewModelTest {
     }
 
     @Test
-    fun `should emit navigation effect on NavigateToDetailsScreen intent`() = runTest {
+    fun `should emit navigation effect when NavigateToDetailsScreen intent`() = runTest {
         // Arrange
-        val post = Post(id = 1, title = "Post", body = "Body", userId = 1)
-        viewModel.effectFlow.test {
-            // Act
-            viewModel.handleIntent(FavoritesIntent.NavigateToDetailsScreen(post))
+        val post = Post(userId = 1, id = 1, title = "Post", body = "Body")
 
-            // Assert
+        // Act & Assert
+        viewModel.effectFlow.test {
+            viewModel.handleIntent(FavoritesIntent.NavigateToDetailsScreen(post))
             Truth.assertThat(awaitItem() is FavoritesEffect.NavigateToDetailsScreen).isTrue()
         }
     }

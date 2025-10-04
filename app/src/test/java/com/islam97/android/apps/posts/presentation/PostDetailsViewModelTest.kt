@@ -60,19 +60,19 @@ class PostDetailsViewModelTest {
     }
 
     @Test
-    fun `should emit comments on GetPostComments intent success`() = runTest {
+    fun `should emit comments when GetPostComments intent success`() = runTest {
         // Arrange
+        val postId = 1L
         val testCommentsList = listOf(
-            Comment(postId = 1, id = 1, name = "Name 1", email = "", body = "Body 1"),
-            Comment(postId = 1, id = 2, name = "Name 2", email = "", body = "Body 2")
+            Comment(postId = postId, id = 1, name = "Name 1", email = "", body = "Body 1"),
+            Comment(postId = postId, id = 2, name = "Name 2", email = "", body = "Body 2")
         )
-        coEvery { getPostCommentsUseCase(1) } returns Result.Success(testCommentsList)
-        viewModel.state.test {
-            // Act
-            viewModel.handleIntent(PostDetailsIntent.GetPostComments(1))
+        coEvery { getPostCommentsUseCase(postId) } returns Result.Success(testCommentsList)
 
-            // Assert
-            skipItems(1) // skip first emission which is for old state
+        // Act & Assert
+        viewModel.state.test {
+            viewModel.handleIntent(PostDetailsIntent.GetPostComments(postId))
+            skipItems(1) //skip first emission which is for old state
             val state = awaitItem()
             Truth.assertThat(state.isLoading).isFalse()
             Truth.assertThat(state.comments).isEqualTo(testCommentsList)
@@ -83,17 +83,16 @@ class PostDetailsViewModelTest {
     }
 
     @Test
-    fun `should emit error state on GetPostComments intent failure`() = runTest {
+    fun `should emit error when GetPostComments intent failure`() = runTest {
         // Arrange
+        val postId = 1L
         val errorMessage = "Something went wrong"
-        coEvery { getPostCommentsUseCase(1) } returns Result.Error(errorMessage)
+        coEvery { getPostCommentsUseCase(postId) } returns Result.Error(errorMessage)
 
+        // Act & Assert
         viewModel.state.test {
-            // Act
-            viewModel.handleIntent(PostDetailsIntent.GetPostComments(1))
-
-            // Assert
-            skipItems(1) // skip first emission which is for old state
+            viewModel.handleIntent(PostDetailsIntent.GetPostComments(postId))
+            skipItems(1) //skip first emission which is for old state
             val state = awaitItem()
             Truth.assertThat(state.isLoading).isFalse()
             Truth.assertThat(state.errorMessage).isEqualTo(errorMessage)
@@ -103,14 +102,15 @@ class PostDetailsViewModelTest {
     }
 
     @Test
-    fun `should update favorite state on CheckFavoriteState intent`() = runTest {
+    fun `should update favorite state when CheckFavoriteState intent`() = runTest {
         // Arrange
-        coEvery { isPostFavoriteUseCase(1) } returns flowOf(true, false)
+        val postId = 1L
+        coEvery { isPostFavoriteUseCase(postId) } returns flowOf(true, false)
+
+        // Act & Assert
         viewModel.state.test {
-            // Act
-            viewModel.handleIntent(PostDetailsIntent.CheckFavoriteState(1))
-            // Assert
-            skipItems(1) // skip first emission which is for old state
+            viewModel.handleIntent(PostDetailsIntent.CheckFavoriteState(postId))
+            skipItems(1) //skip first emission which is for old state
             Truth.assertThat(awaitItem().isFavorite).isTrue()
             Truth.assertThat(awaitItem().isFavorite).isFalse()
             cancelAndIgnoreRemainingEvents()
@@ -121,7 +121,7 @@ class PostDetailsViewModelTest {
     fun `should call insertToFavoriteUseCase when changing favorite from false to true`() =
         runTest {
             // Arrange
-            val post = Post(id = 1, title = "Post", body = "Body", userId = 1)
+            val post = Post(userId = 1, id = 1, title = "Post", body = "Body")
             coEvery { insertToFavoriteUseCase(post) } just Runs
 
             // Act
@@ -136,32 +136,32 @@ class PostDetailsViewModelTest {
     fun `should call deleteFromFavoriteUseCase when changing favorite from true to false`() =
         runTest {
             // Arrange
-            val post = Post(id = 1, title = "Post", body = "Body", userId = 1)
-            coEvery { isPostFavoriteUseCase(post.id) } returns flowOf(true)
-            coEvery { deleteFromFavoriteUseCase(post.id) } just Runs
+            val postId = 1L
+            val post = Post(userId = 1, id = postId, title = "Post", body = "Body")
+            coEvery { isPostFavoriteUseCase(postId) } returns flowOf(true)
+            coEvery { deleteFromFavoriteUseCase(postId) } just Runs
 
             // Act
             viewModel.state.test {
-                viewModel.handleIntent(PostDetailsIntent.CheckFavoriteState(1))
-                skipItems(2) // skip first emission which is for old state
+                viewModel.handleIntent(PostDetailsIntent.CheckFavoriteState(postId))
+                skipItems(2)
                 viewModel.handleIntent(PostDetailsIntent.ChangeFavoriteState(post))
                 cancelAndIgnoreRemainingEvents()
             }
             advanceUntilIdle()
 
             // Assert
-            coVerify { deleteFromFavoriteUseCase(post.id) }
+            coVerify { deleteFromFavoriteUseCase(postId) }
         }
 
     @Test
-    fun `should emit navigation effect on NavigateBack intent`() = runTest {
+    fun `should emit navigation effect when NavigateBack intent`() = runTest {
         // Arrange
         val intent = PostDetailsIntent.NavigateBack
-        viewModel.effectFlow.test {
-            // Act
-            viewModel.handleIntent(intent)
 
-            // Assert
+        // Act & Assert
+        viewModel.effectFlow.test {
+            viewModel.handleIntent(intent)
             Truth.assertThat(awaitItem() is PostDetailsEffect.NavigateBack).isTrue()
         }
     }
