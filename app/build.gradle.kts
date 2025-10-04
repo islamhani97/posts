@@ -62,10 +62,15 @@ android {
         compose = true
         buildConfig = true
     }
+    packaging {
+        resources {
+            excludes += "META-INF/LICENSE.md"
+            excludes += "META-INF/LICENSE-notice.md" // optional if needed
+        }
+    }
 }
 
 dependencies {
-
     // Core Android and Kotlin Extensions
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
